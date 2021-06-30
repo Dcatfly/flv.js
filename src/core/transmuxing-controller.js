@@ -125,7 +125,7 @@ class TransmuxingController {
     _loadSegment(segmentIndex, optionalFrom) {
         this._currentSegmentIndex = segmentIndex;
         let dataSource = this._mediaDataSource.segments[segmentIndex];
-
+        // 创建io controller, 用于数据交换
         let ioctl = this._ioctl = new IOController(dataSource, this._config, segmentIndex);
         ioctl.onError = this._onIOException.bind(this);
         ioctl.onSeeked = this._onIOSeeked.bind(this);
@@ -136,6 +136,7 @@ class TransmuxingController {
         if (optionalFrom) {
             this._demuxer.bindDataSource(this._ioctl);
         } else {
+            //给io control中设置onDataArrival
             ioctl.onDataArrival = this._onInitChunkArrival.bind(this);
         }
 
@@ -267,7 +268,7 @@ class TransmuxingController {
             this._demuxer.onMediaInfo = this._onMediaInfo.bind(this);
             this._demuxer.onMetaDataArrived = this._onMetaDataArrived.bind(this);
             this._demuxer.onScriptDataArrived = this._onScriptDataArrived.bind(this);
-
+            // 创建mp4 remuxer和flv demuxer并做关联
             this._remuxer.bindDataSource(this._demuxer
                          .bindDataSource(this._ioctl
             ));

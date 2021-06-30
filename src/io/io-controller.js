@@ -35,7 +35,7 @@ import {RuntimeException, IllegalStateException, InvalidArgumentException} from 
  *     cors: boolean,
  *     withCredentials: boolean
  * }
- * 
+ *
  */
 
 // Manage IO Loaders
@@ -92,7 +92,9 @@ class IOController {
         this._onRecoveredEarlyEof = null;
 
         this._selectSeekHandler();
+        //现代浏览器中会使用FetchStreamLoader
         this._selectLoader();
+        //new FetchStreamLoader开始使用fetch获取数据并设置相应事件
         this._createLoader();
     }
 
@@ -259,6 +261,7 @@ class IOController {
         }
         this._loader.onContentLengthKnown = this._onContentLengthKnown.bind(this);
         this._loader.onURLRedirect = this._onURLRedirect.bind(this);
+        //设置data loaded事件处理
         this._loader.onDataArrival = this._onLoaderChunkArrival.bind(this);
         this._loader.onComplete = this._onLoaderComplete.bind(this);
         this._loader.onError = this._onLoaderError.bind(this);
@@ -435,6 +438,8 @@ class IOController {
 
     _dispatchChunks(chunks, byteStart) {
         this._currentRange.to = byteStart + chunks.byteLength - 1;
+        // 初次调用transmuxing-controller中的_onInitChunkArrival
+        // 后面调用flv demuxer中的parseChunks
         return this._onDataArrival(chunks, byteStart);
     }
 
@@ -478,7 +483,7 @@ class IOController {
                 this._adjustStashSize(normalized);
             }
         }
-
+        // 对数据流中捕获的chunk进行处理，看起来即便没有缓存也会使用_stashBuffer？
         if (!this._enableStash) {  // disable stash
             if (this._stashUsed === 0) {
                 // dispatch chunk directly to consumer;

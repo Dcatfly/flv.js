@@ -120,10 +120,11 @@ class FetchStreamLoader extends BaseLoader {
         // add abort controller, by wmlgl 2019-5-10 12:21:27
         if (self.AbortController) {
             this._abortController = new self.AbortController();
-            params.signal = this._abortController.signal;     
+            params.signal = this._abortController.signal;
         }
 
         this._status = LoaderStatus.kConnecting;
+        //使用fetch发请求
         self.fetch(seekConfig.url, params).then((res) => {
             if (this._requestAbort) {
                 this._status = LoaderStatus.kIdle;
@@ -221,6 +222,7 @@ class FetchStreamLoader extends BaseLoader {
                 this._receivedLength += chunk.byteLength;
 
                 if (this._onDataArrival) {
+                    // io-controller中的_onLoaderChunkArrival
                     this._onDataArrival(chunk, byteStart, this._receivedLength);
                 }
 

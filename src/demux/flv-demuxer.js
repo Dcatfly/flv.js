@@ -133,7 +133,7 @@ class FLVDemuxer {
     static probe(buffer) {
         let data = new Uint8Array(buffer);
         let mismatch = {match: false};
-
+        //FLV格式校验
         if (data[0] !== 0x46 || data[1] !== 0x4C || data[2] !== 0x56 || data[3] !== 0x01) {
             return mismatch;
         }
@@ -358,6 +358,7 @@ class FLVDemuxer {
         // dispatch parsed frames to consumer (typically, the remuxer)
         if (this._isInitialMetadataDispatched()) {
             if (this._dispatch && (this._audioTrack.length || this._videoTrack.length)) {
+                // MP4 REMUXER中的remux，那边还有个组装的过程
                 this._onDataAvailable(this._audioTrack, this._videoTrack);
             }
         }

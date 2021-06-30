@@ -127,7 +127,7 @@ class FlvPlayer {
     off(event, listener) {
         this._emitter.removeListener(event, listener);
     }
-
+    //主流程入口，创建MSE
     attachMediaElement(mediaElement) {
         this._mediaElement = mediaElement;
         mediaElement.addEventListener('loadedmetadata', this.e.onvLoadedMetadata);
@@ -205,7 +205,7 @@ class FlvPlayer {
             // IE11 may throw InvalidStateError if readyState === 0
             this._mediaElement.currentTime = 0;
         }
-
+        // 创建TransmuxingController 处理worker和事件通信
         this._transmuxer = new Transmuxer(this._mediaDataSource, this._config);
 
         this._transmuxer.on(TransmuxingEvents.INIT_SEGMENT, (type, is) => {
@@ -258,7 +258,7 @@ class FlvPlayer {
                 this._mediaElement.currentTime = milliseconds / 1000;
             }
         });
-
+        //开始 loadSegment
         this._transmuxer.open();
     }
 
